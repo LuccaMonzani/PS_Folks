@@ -1,0 +1,41 @@
+{
+    "Raio-X": [
+        "\\braio[ -]?x\\b",
+        "\\brx\\b",
+        "\\bradiografia\\b"
+    ],
+    "Ressonância Magnética": [
+        "\\brm\\b",
+        "\\brnm\\b",
+        "\\bressonancia\\b",
+        "\\bressonancia magnetica\\b"
+    ],
+    "Tomografia Computadorizada": [
+        "\\btc\\b",
+        "\\btomografia\\b",
+        "\\btomografia computadorizada\\b"
+    ],
+    "Ultrassonografia": [
+        "\\bus\\b",
+        "\\busg\\b",
+        "\\bultrassom\\b",
+        "\\bultrassonografia\\b"
+    ],
+    "Mamografia": [
+        "\\bmamografia\\b"
+    ],
+    "Densitometria Óssea": [
+        "\\bdensitometria\\b",
+        "\\bdensitometria ossea\\b"
+    ],
+    "Cintilografia": [
+        "\\bcintilografia\\b"
+    ],
+    "Angiografia": [
+        "\\bangiografia\\b"
+    ],
+    "Ecodoppler": [
+        "\\becodoppler\\b",
+        "\\bdoppler\\b"
+    ]
+}
