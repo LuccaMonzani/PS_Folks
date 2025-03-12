@@ -9,6 +9,10 @@ URL_NAO_ESTRUTURADOS = "http://127.0.0.1:5000/nao_estruturados"
 URL_ATUALIZAR_ESTRUTURADOS = "http://127.0.0.1:5000/atualizar_mensagem_estruturados"
 URL_ATUALIZAR_NAO_ESTRUTURADOS = "http://127.0.0.1:5000/atualizar_mensagem_nao_estruturados"
 
+# NOVAS URLs para atualização de dashboard
+URL_DASHBOARD_ESTRUTURADOS = "http://127.0.0.1:5000/atualizar_dashboard_estruturados"
+URL_DASHBOARD_NAO_ESTRUTURADOS = "http://127.0.0.1:5000/atualizar_dashboard_nao_estruturados"
+
 # Carregar o modelo treinado e o vetorizador
 modelo_svm = joblib.load("../SVM/modelo_svm.pkl")
 vectorizer = joblib.load("../SVM/vectorizer.pkl")
@@ -36,7 +40,6 @@ def prever_exame(ds_receita):
     
     return predicao
 
-
 # Função para atualizar mensagens via API
 def atualizar_mensagem(api_url, id_registro, status):
     try:
@@ -46,6 +49,16 @@ def atualizar_mensagem(api_url, id_registro, status):
         print(f"Registro {id_registro} atualizado com status: {status}")
     except requests.exceptions.RequestException as e:
         print(f"Erro ao atualizar via API: {e}")
+
+# Atualizar dashboard via API
+def atualizar_dashboard(api_url, metric, incremento=1):
+    payload = {"metric": metric, "incremento": incremento}
+    try:
+        response = requests.post(api_url, json=payload)
+        response.raise_for_status()
+        print(f"Dashboard atualizado: {metric} + {incremento}")
+    except requests.exceptions.RequestException as e:
+        print(f"Erro ao atualizar dashboard: {e}")
 
 def carregar_dicionario_tuss():
     """Carrega o dicionário de TUSS a partir do arquivo JSON na mesma pasta do script."""
@@ -68,6 +81,9 @@ def processar_dados_estruturados():
     dicionario_tuss = carregar_dicionario_tuss()
     
     for dado in dados:
+        # Atualiza o contador de registros processados
+        atualizar_dashboard(URL_DASHBOARD_ESTRUTURADOS, "processados", 1)
+        
         id_registro = dado.get("ID")
         nome_paciente = dado.get("SOLICITANTE", "Paciente")
         telefone = dado.get("TEL", "Não informado")
@@ -85,16 +101,21 @@ def processar_dados_estruturados():
             )
             print(f"Enviando mensagem para {telefone}:\n{mensagem}\n")
             atualizar_mensagem(URL_ATUALIZAR_ESTRUTURADOS, id_registro, "mensagem enviada")
+            # Atualiza contadores de mensagens enviadas e do exame identificado
+            atualizar_dashboard(URL_DASHBOARD_ESTRUTURADOS, "mensagens_enviadas", 1)
+            atualizar_dashboard(URL_DASHBOARD_ESTRUTURADOS, exame, 1)
         else:
             # Caso o código não esteja no dicionário, indicar que não há necessidade de mensagem
             atualizar_mensagem(URL_ATUALIZAR_ESTRUTURADOS, id_registro, "sem necessidade de mensagem")
-
 
 # Processamento dos dados não estruturados
 def processar_dados_nao_estruturados():
     dados = obter_dados(URL_NAO_ESTRUTURADOS)
     
     for dado in dados:
+        # Atualiza o contador de registros processados
+        atualizar_dashboard(URL_DASHBOARD_NAO_ESTRUTURADOS, "processados", 1)
+        
         id_registro = dado["ID"]
         nome_paciente = dado["SOLICITANTE"]
         telefone = dado["TEL"]
@@ -112,6 +133,9 @@ def processar_dados_nao_estruturados():
             )
             print(f"Enviando mensagem para {telefone}:\n{mensagem}\n")
             atualizar_mensagem(URL_ATUALIZAR_NAO_ESTRUTURADOS, id_registro, "mensagem enviada")
+            # Atualiza contadores de mensagens enviadas e do exame identificado
+            atualizar_dashboard(URL_DASHBOARD_NAO_ESTRUTURADOS, "mensagens_enviadas", 1)
+            atualizar_dashboard(URL_DASHBOARD_NAO_ESTRUTURADOS, exame, 1)
         else:
             atualizar_mensagem(URL_ATUALIZAR_NAO_ESTRUTURADOS, id_registro, "sem necessidade de mensagem")
 

@@ -11,5 +11,22 @@ for arquivo_csv, nome_tabela in [("sample_estruturados.csv", "estruturados"), ("
 
 print("Tabelas criadas com sucesso!")
 
+# Criação das tabelas de dashboard
+comandos = [
+    """CREATE TABLE IF NOT EXISTS dashboard_estruturados (
+            metric TEXT PRIMARY KEY,
+            valor INTEGER DEFAULT 0
+        );""",
+    """CREATE TABLE IF NOT EXISTS dashboard_nao_estruturados (
+            metric TEXT PRIMARY KEY,
+            valor INTEGER DEFAULT 0
+        );"""
+]
+
+for cmd in comandos:
+    conector.execute(cmd)
+conector.commit()
+print("Tabelas de dashboard criadas com sucesso!")
+
 # Fechar conexão
 conector.close()
